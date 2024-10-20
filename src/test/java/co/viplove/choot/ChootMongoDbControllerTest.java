@@ -19,25 +19,25 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import co.viplove.choot.controller.ChootController;
+import co.viplove.choot.controller.ChootMongoDbController;
 import co.viplove.choot.entity.ChootDocument;
-import co.viplove.choot.service.ChootService;
+import co.viplove.choot.service.ChootMongoDbService;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(ChootController.class)
-public class ChootControllerTest {
+@WebMvcTest(ChootMongoDbController.class)
+public class ChootMongoDbControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private ChootService chootService;
+    private ChootMongoDbService chootMongoDbService;
 
     @Test
     public void testUploadChoot() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "Test content".getBytes());
         ObjectId id = new ObjectId();
-        when(chootService.storeChoot(any())).thenReturn(id);
+        when(chootMongoDbService.storeChoot(any())).thenReturn(id);
 
         mockMvc.perform(multipart("/choot/upload").file(file))
             .andExpect(status().isOk())
@@ -47,15 +47,15 @@ public class ChootControllerTest {
     @Test
     public void testGetChoot() throws Exception {
         ObjectId id = new ObjectId();
-        ChootDocument chootDocument = new ChootDocument();
-        chootDocument.setFilename("test.jpeg");
-        ChootDocument.Metadata metadata = chootDocument.new Metadata();
+        ChootDocument chootMongoDbDocument = new ChootDocument();
+        chootMongoDbDocument.setFilename("test.jpeg");
+        ChootDocument.Metadata metadata = chootMongoDbDocument.new Metadata();
         metadata.setContentType("image/jpeg");
-        chootDocument.setMetadata(metadata); // Create an instance of the inner class using the outer class instance
+        chootMongoDbDocument.setMetadata(metadata); // Create an instance of the inner class using the outer class instance
         InputStream chootStream = new ByteArrayInputStream("Test content".getBytes());
 
-        when(chootService.getDocumentById(id)).thenReturn(chootDocument);
-        when(chootService.getChoot(id)).thenReturn(chootStream);
+        when(chootMongoDbService.getDocumentById(id)).thenReturn(chootMongoDbDocument);
+        when(chootMongoDbService.getChoot(id)).thenReturn(chootStream);
 
         mockMvc.perform(get("/choot/" + id.toHexString()))
             .andExpect(status().isOk())

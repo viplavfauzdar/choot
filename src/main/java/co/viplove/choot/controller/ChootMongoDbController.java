@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import co.viplove.choot.entity.ChootDocument;
-import co.viplove.choot.service.ChootService;
+import co.viplove.choot.service.ChootMongoDbService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -21,14 +21,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/choot")
 @Slf4j
-public class ChootController {
+public class ChootMongoDbController {
 
     @Autowired
-    private ChootService ChootService;
+    private ChootMongoDbService chootMongoDbService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadChoot(@RequestBody MultipartFile file) throws IOException {
-        ObjectId id = ChootService.storeChoot(file);
+        ObjectId id = chootMongoDbService.storeChoot(file);
         return ResponseEntity.ok(id.toHexString());
     }
 
@@ -39,16 +39,16 @@ public class ChootController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ObjectId format");
         }
         ObjectId objectId = new ObjectId(id);
-        ChootDocument ChootDocument = ChootService.getDocumentById(objectId);
-        String contentType = ChootDocument.getMetadata().getContentType();
+        ChootDocument chootMongoDbDocument = chootMongoDbService.getDocumentById(objectId);
+        String contentType = chootMongoDbDocument.getMetadata().getContentType();
         
         log.info("CONTENT TYPE: {}", contentType);
-        InputStream ChootStream = ChootService.getChoot(objectId);
+        InputStream ChootStream = chootMongoDbService.getChoot(objectId);
 
         byte[] ChootBytes = ChootStream.readAllBytes();
 
         return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + ChootDocument.getFilename() + "\"")
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + chootMongoDbDocument.getFilename() + "\"")
             //.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + ChootDocument.getFilename() + "\"")
             .contentType(MediaType.parseMediaType(contentType)) // Fix: Create MediaType object using contentType string
             .body(ChootBytes);
@@ -57,13 +57,13 @@ public class ChootController {
 
     @GetMapping("/all-choots")
     public ResponseEntity<List<ChootDocument>> getAllChoots() {
-        List<ChootDocument> Choots = ChootService.getAllChoots();
+        List<ChootDocument> Choots = chootMongoDbService.getAllChoots();
         return ResponseEntity.ok(Choots);
     }
 
     @DeleteMapping("/delete/dbname")
     public void dropDataBase(String dbName){
-        ChootService.dropDataBase(dbName);
+        chootMongoDbService.dropDataBase(dbName);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -73,7 +73,7 @@ public class ChootController {
         }
 
         ObjectId objectId = new ObjectId(id);
-        ChootService.deleteChoot(objectId);
+        chootMongoDbService.deleteChoot(objectId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -27,7 +27,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class ChootService {
+public class ChootMongoDbService {
 
     //@Autowired
     private final GridFSBucket gridFSBucket;
@@ -45,7 +45,7 @@ public class ChootService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public ChootService(MongoDatabaseFactory mongoDatabaseFactory) {
+    public ChootMongoDbService(MongoDatabaseFactory mongoDatabaseFactory) {
         this.mongoDatabaseFactory = mongoDatabaseFactory;
         this.mongoDatabase = mongoDatabaseFactory.getMongoDatabase();
         this.gridFSBucket = GridFSBuckets.create(mongoDatabase);
