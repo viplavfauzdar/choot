@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 @Configuration
 public class MongoConfig {
 
-    @Value("${choot.database-name}")
+    @Value("${choot.mongodb-database-name}")
     private String databaseName;
 
     
