@@ -10,7 +10,7 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 
-import co.viplove.choot.entity.ImageDocument;
+import co.viplove.choot.entity.ChootDocument;
 import lombok.extern.slf4j.Slf4j;
 
 import org.bson.Document;
@@ -27,7 +27,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class ImageService {
+public class ChootService {
 
     //@Autowired
     private final GridFSBucket gridFSBucket;
@@ -45,14 +45,14 @@ public class ImageService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public ImageService(MongoDatabaseFactory mongoDatabaseFactory) {
+    public ChootService(MongoDatabaseFactory mongoDatabaseFactory) {
         this.mongoDatabaseFactory = mongoDatabaseFactory;
         this.mongoDatabase = mongoDatabaseFactory.getMongoDatabase();
         this.gridFSBucket = GridFSBuckets.create(mongoDatabase);
         this.filesCollection = mongoDatabase.getCollection(FILE_COLLECTION);
     }
 
-    public ObjectId storeImage(MultipartFile file) throws IOException {
+    public ObjectId storeChoot(MultipartFile file) throws IOException {
         try (InputStream inputStream = file.getInputStream()) {
             GridFSUploadOptions options = new GridFSUploadOptions()
                     .chunkSizeBytes(358400)
@@ -63,11 +63,11 @@ public class ImageService {
         }
     }
 
-    public InputStream getImage(ObjectId id) {
+    public InputStream getChoot(ObjectId id) {
         return gridFSBucket.openDownloadStream(id);
     }
 
-    public void deleteImage(ObjectId id) {
+    public void deleteChoot(ObjectId id) {
         gridFSBucket.delete(id);
     }
 
@@ -75,28 +75,28 @@ public class ImageService {
         mongoDatabaseFactory.getMongoDatabase(dbName).drop();
     }
 
-    public ImageDocument getDocumentById(ObjectId id) {
+    public ChootDocument getDocumentById(ObjectId id) {
         //MongoCollection<Document> filesCollection = mongoDatabase.getCollection("fs.files");
         Document query = new Document("_id", id);
         Document doc = filesCollection.find(query).first();
-        ImageDocument imageDocument = null;
+        ChootDocument ChootDocument = null;
         try {
-            imageDocument = objectMapper.readValue(doc.toJson(), ImageDocument.class);
+            ChootDocument = objectMapper.readValue(doc.toJson(), ChootDocument.class);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return imageDocument;
+        return ChootDocument;
     }
 
-    public List<ImageDocument> getAllImages() {
-        List<ImageDocument> images = new ArrayList<>();
+    public List<ChootDocument> getAllChoots() {
+        List<ChootDocument> Choots = new ArrayList<>();
         //MongoDatabase database = mongoDatabaseFactory.getMongoDatabase();
         //MongoCollection<Document> filesCollection = mongoDatabase.getCollection("fs.files");
         log.info(filesCollection.toString());
         /* List<Document> documents = filesCollection.find().projection(include("_id")).into(new ArrayList<>());
             documents.forEach(doc -> {
-                imageIds.add(doc.getObjectId("_id"));
+                ChootIds.add(doc.getObjectId("_id"));
                 log.info(doc.toJson());
                 log.info(doc.getObjectId("_id").toString());
             }
@@ -106,9 +106,9 @@ public class ImageService {
             while (cursor.hasNext()) {
                 Document doc = cursor.next();
                 try {
-                    ImageDocument imageDocument = objectMapper.readValue(doc.toJson(), ImageDocument.class);
-                    images.add(imageDocument);
-                    log.info(imageDocument.toString());
+                    ChootDocument ChootDocument = objectMapper.readValue(doc.toJson(), ChootDocument.class);
+                    Choots.add(ChootDocument);
+                    log.info(ChootDocument.toString());
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -123,11 +123,11 @@ public class ImageService {
        /*  try (MongoCursor<Document> cursor = filesCollection.find().p.iterator()) {
             while (cursor.hasNext()) {
                 Document doc = cursor.next();
-                imageIds.add(doc.get("_id"));
+                ChootIds.add(doc.get("_id"));
             }
         } */
 
-        return images;
+        return Choots;
     }
 
 
