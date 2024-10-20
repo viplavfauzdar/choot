@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
-import co.viplove.choot.entity.ChootDocument;
+import co.viplove.choot.entity.ChootMongoDbDocument;
 import co.viplove.choot.service.ChootMongoDbService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +39,7 @@ public class ChootMongoDbController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ObjectId format");
         }
         ObjectId objectId = new ObjectId(id);
-        ChootDocument chootMongoDbDocument = chootMongoDbService.getDocumentById(objectId);
+        ChootMongoDbDocument chootMongoDbDocument = chootMongoDbService.getDocumentById(objectId);
         String contentType = chootMongoDbDocument.getMetadata().getContentType();
         
         log.info("CONTENT TYPE: {}", contentType);
@@ -56,8 +56,8 @@ public class ChootMongoDbController {
     }
 
     @GetMapping("/all-choots")
-    public ResponseEntity<List<ChootDocument>> getAllChoots() {
-        List<ChootDocument> Choots = chootMongoDbService.getAllChoots();
+    public ResponseEntity<List<ChootMongoDbDocument>> getAllChoots() {
+        List<ChootMongoDbDocument> Choots = chootMongoDbService.getAllChoots();
         return ResponseEntity.ok(Choots);
     }
 

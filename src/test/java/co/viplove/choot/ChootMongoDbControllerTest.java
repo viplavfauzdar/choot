@@ -20,7 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import co.viplove.choot.controller.ChootMongoDbController;
-import co.viplove.choot.entity.ChootDocument;
+import co.viplove.choot.entity.ChootMongoDbDocument;
 import co.viplove.choot.service.ChootMongoDbService;
 
 @ExtendWith(SpringExtension.class)
@@ -47,9 +47,9 @@ public class ChootMongoDbControllerTest {
     @Test
     public void testGetChoot() throws Exception {
         ObjectId id = new ObjectId();
-        ChootDocument chootMongoDbDocument = new ChootDocument();
+        ChootMongoDbDocument chootMongoDbDocument = new ChootMongoDbDocument();
         chootMongoDbDocument.setFilename("test.jpeg");
-        ChootDocument.Metadata metadata = chootMongoDbDocument.new Metadata();
+        ChootMongoDbDocument.Metadata metadata = chootMongoDbDocument.new Metadata();
         metadata.setContentType("image/jpeg");
         chootMongoDbDocument.setMetadata(metadata); // Create an instance of the inner class using the outer class instance
         InputStream chootStream = new ByteArrayInputStream("Test content".getBytes());

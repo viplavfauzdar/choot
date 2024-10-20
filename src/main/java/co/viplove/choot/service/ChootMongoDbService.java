@@ -10,7 +10,7 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 
-import co.viplove.choot.entity.ChootDocument;
+import co.viplove.choot.entity.ChootMongoDbDocument;
 import lombok.extern.slf4j.Slf4j;
 
 import org.bson.Document;
@@ -75,13 +75,13 @@ public class ChootMongoDbService {
         mongoDatabaseFactory.getMongoDatabase(dbName).drop();
     }
 
-    public ChootDocument getDocumentById(ObjectId id) {
+    public ChootMongoDbDocument getDocumentById(ObjectId id) {
         //MongoCollection<Document> filesCollection = mongoDatabase.getCollection("fs.files");
         Document query = new Document("_id", id);
         Document doc = filesCollection.find(query).first();
-        ChootDocument ChootDocument = null;
+        ChootMongoDbDocument ChootDocument = null;
         try {
-            ChootDocument = objectMapper.readValue(doc.toJson(), ChootDocument.class);
+            ChootDocument = objectMapper.readValue(doc.toJson(), ChootMongoDbDocument.class);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -89,8 +89,8 @@ public class ChootMongoDbService {
         return ChootDocument;
     }
 
-    public List<ChootDocument> getAllChoots() {
-        List<ChootDocument> Choots = new ArrayList<>();
+    public List<ChootMongoDbDocument> getAllChoots() {
+        List<ChootMongoDbDocument> Choots = new ArrayList<>();
         //MongoDatabase database = mongoDatabaseFactory.getMongoDatabase();
         //MongoCollection<Document> filesCollection = mongoDatabase.getCollection("fs.files");
         log.info(filesCollection.toString());
@@ -106,7 +106,7 @@ public class ChootMongoDbService {
             while (cursor.hasNext()) {
                 Document doc = cursor.next();
                 try {
-                    ChootDocument ChootDocument = objectMapper.readValue(doc.toJson(), ChootDocument.class);
+                    ChootMongoDbDocument ChootDocument = objectMapper.readValue(doc.toJson(), ChootMongoDbDocument.class);
                     Choots.add(ChootDocument);
                     log.info(ChootDocument.toString());
                 } catch (Exception e) {

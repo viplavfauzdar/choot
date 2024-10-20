@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class ChootDocument {
+public class ChootMongoDbDocument {
 
     @JsonProperty("_id")
     private Id id;
