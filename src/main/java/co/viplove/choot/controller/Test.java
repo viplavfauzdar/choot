@@ -4,14 +4,15 @@ import java.io.IOException;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import java.io.IOException;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
 
 @RestController
 public class Test {
@@ -35,6 +36,15 @@ public class Test {
 
         // Return the image as a byte array
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    }
+
+    public static void main(String[] args) {
+        HashMap<String, List<String>> likes = new HashMap<>();
+        List<String> likedUsers = List.of("dingo", "john");
+        likes.put("viplav", likedUsers);
+        likes.put("dingo", List.of("viplav"));
+        likes.put("john", List.of("dingo"));
+        System.out.println(likes);
     }
     
     

@@ -1,8 +1,10 @@
 package co.viplove.choot.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import co.viplove.choot.entity.Neo4JLikedUsers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,16 +32,28 @@ public class ChootNeo4jUserService {
     }
 
     @Transactional
-    public ChootNeo4jUser createUser(String username, String email, List<ChootNeo4jUser> matchedUsers) {
-        ChootNeo4jUser user = new ChootNeo4jUser(username, email);
-        user.setMatchedUsers(matchedUsers);
+    public ChootNeo4jUser addLikedUser(String username, String likedUserName) {
+        ChootNeo4jUser user = userRepository.findById(username).orElseThrow(() -> new RuntimeException("User not found"));
+        ChootNeo4jUser likedUser = userRepository.findById(likedUserName).orElseThrow(() -> new RuntimeException("Liked User not found"));
+
+        // Check for circular relationship
+        boolean circularRelationshipExists = userRepository.existsRelationship(likedUserName, username);
+        if (circularRelationshipExists) {
+            throw new RuntimeException("Circular relationship detected");
+        }
+
+        List<Neo4JLikedUsers> likedUsers = user.getLikedUsers();
+        if (likedUsers == null) likedUsers = new ArrayList<>();
+        likedUsers.add(new Neo4JLikedUsers(username, likedUserName));
+        user.setLikedUsers(likedUsers);
         return userRepository.save(user);
     }
 
-    @Transactional
-    public void addMatchedUser(String username, ChootNeo4jUser matchedUser) {
-        ChootNeo4jUser user = userRepository.findById(username).orElseThrow(() -> new RuntimeException("User not found"));
-        user.getMatchedUsers().add(matchedUser);
-        userRepository.save(user);
+    public void deleteAllUsers() {
+        userRepository.deleteAll();
+    }
+
+    public void deleteUserByUsername(String username) {
+        userRepository.deleteById(username);
     }
 }
