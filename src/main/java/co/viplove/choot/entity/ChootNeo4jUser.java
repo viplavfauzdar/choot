@@ -1,7 +1,6 @@
 package co.viplove.choot.entity;
 
 import lombok.Data;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
@@ -20,9 +19,6 @@ public class ChootNeo4jUser {
     }
 
     @Id
-    @GeneratedValue
-    private Long id;
-
     private String username;
     private String email;
     private Integer age;
@@ -33,8 +29,8 @@ public class ChootNeo4jUser {
     private List<String> languages;
     private boolean deactivated;
 
-    @Relationship(type = "LIKES", direction = Relationship.Direction.OUTGOING)
-    private List<Neo4JLikedUsers> likedUsers;
+    @Relationship(type = "MATCHES", direction = Relationship.Direction.OUTGOING)
+    private List<ChootNeo4jUser> likedUsers;
 
     @Data
     public static class Location {

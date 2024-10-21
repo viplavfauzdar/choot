@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import co.viplove.choot.entity.Neo4JLikedUsers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,9 +41,11 @@ public class ChootNeo4jUserService {
             throw new RuntimeException("Circular relationship detected");
         }
 
-        List<Neo4JLikedUsers> likedUsers = user.getLikedUsers();
-        if (likedUsers == null) likedUsers = new ArrayList<>();
-        likedUsers.add(new Neo4JLikedUsers(username, likedUserName));
+        List<ChootNeo4jUser> likedUsers = user.getLikedUsers();
+        if (likedUsers == null) {
+            likedUsers = new ArrayList<>();
+        }
+        likedUsers.add(likedUser);
         user.setLikedUsers(likedUsers);
         return userRepository.save(user);
     }

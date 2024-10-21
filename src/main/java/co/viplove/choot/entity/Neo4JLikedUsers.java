@@ -5,19 +5,26 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Node
 @Data
 public class Neo4JLikedUsers {
 
-    @Id
+    /*@Id
     @GeneratedValue
-    private Long id;
+    private Long id;*/
 
+    @Id
     private String username;
-    private String likedUserName;
+    private List<String> likedUserNames;
 
-    public Neo4JLikedUsers(String username, String likedUserName) {
+    public Neo4JLikedUsers(String username) {
         this.username = username;
-        this.likedUserName = likedUserName;
     }
+
+    //private Map<String, List<String>> likedUsers = new HashMap<>();
+
 }
