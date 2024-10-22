@@ -1,6 +1,7 @@
 package co.viplove.choot.entity;
 
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
@@ -29,8 +30,11 @@ public class ChootNeo4jUser {
     private List<String> languages;
     private boolean deactivated;
 
-    @Relationship(type = "MATCHES", direction = Relationship.Direction.OUTGOING)
+    //@ToString.Exclude
+    @Relationship(type = "LIKED", direction = Relationship.Direction.OUTGOING)
     private List<ChootNeo4jUser> likedUsers;
+
+    private List<String> matchedUsers; // user object causes  circular relationship
 
     @Data
     public static class Location {

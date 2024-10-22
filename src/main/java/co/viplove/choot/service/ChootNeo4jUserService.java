@@ -31,20 +31,40 @@ public class ChootNeo4jUserService {
     }
 
     @Transactional
-    public ChootNeo4jUser addLikedUser(String username, String likedUserName) {
-        ChootNeo4jUser user = userRepository.findById(username).orElseThrow(() -> new RuntimeException("User not found"));
+    public ChootNeo4jUser addLikedUser(String userName, String likedUserName) {
+        ChootNeo4jUser user = userRepository.findById(userName).orElseThrow(() -> new RuntimeException("User not found"));
         ChootNeo4jUser likedUser = userRepository.findById(likedUserName).orElseThrow(() -> new RuntimeException("Liked User not found"));
 
         // Check for circular relationship
-        boolean circularRelationshipExists = userRepository.existsRelationship(likedUserName, username);
+        /*boolean circularRelationshipExists = userRepository.existsRelationship(likedUserName, username);
         if (circularRelationshipExists) {
             throw new RuntimeException("Circular relationship detected");
         }
-
+*/
         List<ChootNeo4jUser> likedUsers = user.getLikedUsers();
         if (likedUsers == null) {
             likedUsers = new ArrayList<>();
         }
+        // Check for circular relationship
+        //if (likedUsers.contains(likedUser) || likedUser.getLikedUsers().contains(user)) {
+            /*//throw new RuntimeException("Circular relationship detected");
+            List<String> userMatchedUsers = user.getMatchedUsers();
+            if(userMatchedUsers == null) userMatchedUsers = new ArrayList<>();
+            userMatchedUsers.add(likedUserName);
+            user.setMatchedUsers(userMatchedUsers);
+            List<String> likedUserMatchedUsers = likedUser.getMatchedUsers();
+            if(likedUserMatchedUsers == null) likedUserMatchedUsers = new ArrayList<>();
+            likedUserMatchedUsers.add(userName);
+            likedUser.setMatchedUsers(likedUserMatchedUsers);
+            return userRepository.save(user);*/
+
+            //make liked users list of liked users empty to avoid circular reference
+            //likedUser.getLikedUsers().clear();
+        //}/*else{
+            //likedUsers.add(likedUser);
+        //}*/
+        List<ChootNeo4jUser> likedUsersLikedUsers =  likedUser.getLikedUsers();//.clear();
+        likedUsersLikedUsers = null; //clear liked users of liked user to avoid circular reference
         likedUsers.add(likedUser);
         user.setLikedUsers(likedUsers);
         return userRepository.save(user);
