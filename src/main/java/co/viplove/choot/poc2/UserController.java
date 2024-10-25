@@ -15,21 +15,21 @@ public class UserController {
     @Autowired
     private LikeRepository likeRepository;
 
-    @GetMapping("/{name}")
-    public Optional<User> getUserByUsername(@PathVariable String name) {
-        return userRepository.findByName(name);
+    @GetMapping("/{username}")
+    public Optional<User> getUserByUsername(@PathVariable String username) {
+        return userRepository.findByUsername(username);
     }
 
-    @PostMapping("/{name}")
-    public User createUser(@PathVariable String name) {
-        return userRepository.save(new User(name));
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        return userRepository.save(user);
     }
 
-    @DeleteMapping("/{name}")
-    public void deleteUserByUsername(@PathVariable String name) {
-        userRepository.deleteById(name);
+    @DeleteMapping("/{username}")
+    public void deleteUserByUsername(@PathVariable String username) {
+        userRepository.deleteById(username);
     }
-
+ 
     @DeleteMapping("/deleteall")
     public void deleteAll(){
         userRepository.deleteAll();
@@ -38,8 +38,8 @@ public class UserController {
 
     @PostMapping("/{name}/like/{targetName}")
     public User createLikeRelationship(@PathVariable String name, @PathVariable String targetName) {
-        Optional<User> userOpt = userRepository.findByName(name);
-        Optional<User> targetUserOpt = userRepository.findByName(targetName);
+        Optional<User> userOpt = userRepository.findByUsername(name);
+        Optional<User> targetUserOpt = userRepository.findByUsername(targetName);
 
         if (userOpt.isPresent() && targetUserOpt.isPresent()) {
             User user = userOpt.get();

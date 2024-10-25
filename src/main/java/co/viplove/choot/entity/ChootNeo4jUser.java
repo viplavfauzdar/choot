@@ -25,7 +25,7 @@ public class ChootNeo4jUser {
     private Integer age;
     private String gender;
     private List<String> mongoDbObjectId;
-    private Location location;
+    private LocationOld locationOld;
     private String description;
     private List<String> languages;
     private boolean deactivated;
@@ -37,7 +37,7 @@ public class ChootNeo4jUser {
     private List<String> matchedUsers; // user object causes  circular relationship
 
     @Data
-    public static class Location {
+    public static class LocationOld {
         private BigDecimal latitude;
         private BigDecimal longitude;
     }
