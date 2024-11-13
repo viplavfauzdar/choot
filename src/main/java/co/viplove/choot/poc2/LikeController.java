@@ -1,3 +1,4 @@
+/*
 package co.viplove.choot.poc2;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,4 +27,4 @@ public class LikeController {
     public void deleteLikeById(@PathVariable Long id) {
         likeRepository.deleteById(id);
     }
-}
+}*/

@@ -1,0 +1,68 @@
+package co.viplove.choot.poc4.copilot;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.util.Optional;
+
+@Service
+public class PersonService {
+
+    @Autowired
+    private PersonRepository personRepository;
+
+    public Person createPerson(Person person) {
+        return personRepository.save(person);
+    }
+
+    /*public Optional<Person> findPersonById(Long id) {
+        return personRepository.findById(id);
+    }*/
+
+    public Optional<Person> findPersonByEmail(String email) {
+        return personRepository.findByEmail(email);
+    }
+
+    public Iterable<Person> findAllPersons() {
+        return personRepository.findAll();
+    }
+
+    public void deletePerson(String email) {
+        personRepository.deleteById(email);
+    }
+
+    public Person requestFriendship(String personEmail, String friendEmail) {
+        Optional<Person> personOpt = personRepository.findByEmail(personEmail);
+        Optional<Person> friendOpt = personRepository.findByEmail(friendEmail);
+
+        if (personOpt.isPresent() && friendOpt.isPresent()) {
+            Person person = personOpt.get();
+            Person friend = friendOpt.get();
+            FriendshipRequested friendshipRequested = new FriendshipRequested();
+            friendshipRequested.setFriend(friend);
+            person.setRequestedFriends(friendshipRequested);
+            person.getRequestedFriendsName().add(friend.getName());
+            return personRepository.save(person);
+        } else {
+            throw new RuntimeException("Person or friend not found");
+        }
+    }
+
+    public Person acceptFriendship(String personEmail, String friendEmail) {
+        Optional<Person> personOpt = personRepository.findByEmail(personEmail);
+        Optional<Person> friendOpt = personRepository.findByEmail(friendEmail);
+
+        if (personOpt.isPresent() && friendOpt.isPresent()) {
+            Person person = personOpt.get();
+            Person friend = friendOpt.get();
+            FriendshipAccepted friendshipAccepted = new FriendshipAccepted();
+            friendshipAccepted.setFriend(friend);
+            person.setAcceptedFriends(friendshipAccepted);
+            person.getAcceptedFriendsName().add(friend.getName());
+            return personRepository.save(person);
+        } else {
+            throw new RuntimeException("Person or friend not found");
+        }
+    }
+}

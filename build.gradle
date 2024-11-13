@@ -53,6 +53,8 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-config-server'
 	//implementation 'org.springframework.cloud:spring-cloud-starter-vault-config'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+	implementation 'io.swagger:swagger-annotations:1.6.14'
+
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	compileOnly 'org.projectlombok:lombok'
