@@ -1,10 +1,13 @@
 package co.viplove.choot.poc4.copilot;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.viplove.choot.entity.ChootNeo4jUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
@@ -14,32 +17,50 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 import lombok.Data;
 
 @Node
-//@Data
+@Data //causes stackoverflow error - add @ToString.Exclude and @EqualsAndHashCode.Exclude
 public class Person {
 
     /*@Id
     @GeneratedValue
     private Long personId;*/
 
-    private String createDate = new Timestamp(System.currentTimeMillis()).toString();
-    private String name;
     @Id
     private String email;
+
+    private String createDate = new Timestamp(System.currentTimeMillis()).toString();
+    private String name;
     private String firstName;
     private String lastName;
+    private Integer age;
+    private String gender;
+    private List<String> mongoDbObjectId = new ArrayList<>();
+    private Location location;
+    private String description;
+    private List<String> languages = new ArrayList<>();
+    private boolean deactivated;
 
-    //@ToString.Exclude //still thorws stack overflow error because of nesting
+    /*private String requestedDate;
+    private String acceptedDate;*/
+    private String friendName;
+    private String friendEmail;
+    private String friendRequestedDate;
+    private String friendAcceptedDate;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @Relationship(type = "FRIENDSHIP_REQUESTED", direction = Relationship.Direction.OUTGOING)
     private FriendshipRequested requestedFriends;
 
-    //@ToString.Exclude
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @Relationship(type = "FRIENDSHIP_ACCEPTED", direction = Relationship.Direction.OUTGOING)
     private FriendshipAccepted acceptedFriends;
 
-    private List<String> requestedFriendsName = new ArrayList<>();
-    private List<String> acceptedFriendsName = new ArrayList<>();
+    //not needed
+    /*private List<String> requestedFriendsName = new ArrayList<>();
+    private List<String> acceptedFriendsName = new ArrayList<>();*/
 
     // No-argument constructor
     public Person() {
@@ -50,6 +71,11 @@ public class Person {
         this.name = name;
     }
 
+    @Data
+    public static class Location {
+        private BigDecimal latitude;
+        private BigDecimal longitude;
+    }
 
    /* public Long getPersonId() {
         return personId;
@@ -58,7 +84,7 @@ public class Person {
     public void setPersonId(Long personId) {
         this.personId = personId;
     }*/
-
+/*
     public String getCreateDate() {
         return createDate;
     }
@@ -130,4 +156,12 @@ public class Person {
     public void setAcceptedFriendsName(List<String> acceptedFriendsName) {
         this.acceptedFriendsName = acceptedFriendsName;
     }
+
+    public String getMondodbId() {
+        return mondodbId;
+    }
+
+    public void setMondodbId(String mondodbId) {
+        this.mondodbId = mondodbId;
+    }*/
 }

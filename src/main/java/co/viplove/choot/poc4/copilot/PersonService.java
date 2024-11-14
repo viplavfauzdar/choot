@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,7 +43,7 @@ public class PersonService {
             FriendshipRequested friendshipRequested = new FriendshipRequested();
             friendshipRequested.setFriend(friend);
             person.setRequestedFriends(friendshipRequested);
-            person.getRequestedFriendsName().add(friend.getName());
+            //person.getRequestedFriendsName().add(friend.getName());
             return personRepository.save(person);
         } else {
             throw new RuntimeException("Person or friend not found");
@@ -59,10 +60,26 @@ public class PersonService {
             FriendshipAccepted friendshipAccepted = new FriendshipAccepted();
             friendshipAccepted.setFriend(friend);
             person.setAcceptedFriends(friendshipAccepted);
-            person.getAcceptedFriendsName().add(friend.getName());
+            //person.getAcceptedFriendsName().add(friend.getName());
             return personRepository.save(person);
         } else {
             throw new RuntimeException("Person or friend not found");
         }
+    }
+
+    public List<Optional<Person>> findByFriendRequested(String email) {
+        return personRepository.findByFriendRequested(email);
+    }
+
+    public List<Optional<Person>> findByFriendAccepted(String email) {
+        return personRepository.findByFriendAccepted(email);
+    }
+
+    public Optional<Person> findByAlreadyRequested(String emailPerson, String emailFriend) {
+        return personRepository.findByAlreadyRequested(emailPerson, emailFriend);
+    }
+
+    public Optional<Person> findByAlreadyAccepted(String emailPerson, String emailFriend) {
+        return personRepository.findByAlreadyAccepted(emailPerson, emailFriend);
     }
 }
