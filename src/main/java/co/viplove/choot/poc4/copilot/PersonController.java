@@ -19,14 +19,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/persons")
 @Slf4j
-@Api(value = "Person Controller", tags = {"Person Controller"})
+@Tag(name = "Person Controller", description = "Person Controller")
 public class PersonController {
 
     @Autowired
@@ -36,15 +36,17 @@ public class PersonController {
     private ChootMongoDbService chootMongoDbService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Create a new person")
+    @Operation(summary = "Create a new person")
     public ResponseEntity<Person> createPerson(@RequestBody Person person) {
         Person createdPerson = personService.createPerson(person);
         return ResponseEntity.ok(createdPerson);
     }
 
     @PostMapping(value = "/upload/{email}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ApiOperation(value = "Upload files for a person")
-    public ResponseEntity<Person> uploadChoot(@RequestParam String email, @RequestParam("files") List<MultipartFile> files) throws IOException {
+    @Operation(summary = "Upload files for a person")
+    public ResponseEntity<Person> uploadChoot(
+            @Parameter(description = "Email of the person", required = true) @RequestParam String email,
+            @Parameter(description = "Files to upload", required = true) @RequestParam("files") List<MultipartFile> files) throws IOException {
         Optional<Person> person = personService.findPersonByEmail(email);
         for (MultipartFile file : files) {
             ObjectId oid = chootMongoDbService.storeChoot(file);
@@ -57,8 +59,9 @@ public class PersonController {
     }
 
     @GetMapping("/file/{id}")
-    @ApiOperation(value = "Get a file by its ID")
-    public ResponseEntity<byte[]> getChoot(@PathVariable String id) throws IOException {
+    @Operation(summary = "Get a file by its ID")
+    public ResponseEntity<byte[]> getChoot(
+            @Parameter(description = "ID of the file", required = true) @PathVariable String id) throws IOException {
         if (!ObjectId.isValid(id)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ObjectId format");
         }
@@ -78,43 +81,51 @@ public class PersonController {
     }
 
     @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get a person by email")
-    public ResponseEntity<Person> getPersonByEmail(@PathVariable String email) {
+    @Operation(summary = "Get a person by email")
+    public ResponseEntity<Person> getPersonByEmail(
+            @Parameter(description = "Email of the person", required = true) @PathVariable String email) {
         Optional<Person> person = personService.findPersonByEmail(email);
         return person.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get all persons")
+    @Operation(summary = "Get all persons")
     public ResponseEntity<Iterable<Person>> getAllPersons() {
         Iterable<Person> persons = personService.findAllPersons();
         return ResponseEntity.ok(persons);
     }
 
     @DeleteMapping(value = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Delete a person by email")
-    public ResponseEntity<Void> deletePerson(@PathVariable String email) {
+    @Operation(summary = "Delete a person by email")
+    public ResponseEntity<Void> deletePerson(
+            @Parameter(description = "Email of the person to delete", required = true) @PathVariable String email) {
         personService.deletePerson(email);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping(value = "/{personEmail}/requestFriendship/{friendEmail}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Request friendship with another person")
-    public ResponseEntity<Person> requestFriendship(@PathVariable String personEmail, @PathVariable String friendEmail) {
+    @Operation(summary = "Request friendship with another person")
+    public ResponseEntity<Person> requestFriendship(
+            @Parameter(description = "Email of the person requesting friendship", required = true) @PathVariable String personEmail,
+            @Parameter(description = "Email of the friend", required = true) @PathVariable String friendEmail) {
         Person person = personService.requestFriendship(personEmail, friendEmail);
         return ResponseEntity.ok(person);
     }
 
     @PostMapping(value = "/{personEmail}/acceptFriendship/{friendEmail}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Accept friendship with another person")
-    public ResponseEntity<Person> acceptFriendship(@PathVariable String personEmail, @PathVariable String friendEmail) {
+    @Operation(summary = "Accept friendship with another person")
+    public ResponseEntity<Person> acceptFriendship(
+            @Parameter(description = "Email of the person accepting friendship", required = true) @PathVariable String personEmail,
+            @Parameter(description = "Email of the friend", required = true) @PathVariable String friendEmail) {
         Person person = personService.acceptFriendship(personEmail, friendEmail);
         return ResponseEntity.ok(person);
     }
 
     @GetMapping("/friend/{email}/{type}")
-    @ApiOperation(value = "Get a person by friend's email and relationship type")
-    public ResponseEntity<List<Optional<Person>>> getPersonByFriend(@PathVariable String email, @PathVariable RelationshipType type) {
+    @Operation(summary = "Get a person by friend's email and relationship type")
+    public ResponseEntity<List<Optional<Person>>> getPersonByFriend(
+            @Parameter(description = "Email of the person", required = true) @PathVariable String email,
+            @Parameter(description = "Type of relationship", required = true) @PathVariable RelationshipType type) {
         if (type.equals(RelationshipType.REQUESTED)) {
             List<Optional<Person>> persons = personService.findByFriendRequested(email);
             return ResponseEntity.ok(persons);
@@ -131,8 +142,11 @@ public class PersonController {
     }
 
     @GetMapping("/friend/status/{emailPerson}/{emailFriend}/{type}")
-    @ApiOperation(value = "Check the status of a friendship request/accept")
-    public ResponseEntity<Person> findFriendshipStatus(@PathVariable String emailPerson, @PathVariable String emailFriend, @PathVariable RelationshipType type) {
+    @Operation(summary = "Check the status of a friendship request/accept")
+    public ResponseEntity<Person> findFriendshipStatus(
+            @Parameter(description = "Email of the person", required = true) @PathVariable String emailPerson,
+            @Parameter(description = "Email of the friend", required = true) @PathVariable String emailFriend,
+            @Parameter(description = "Type of relationship", required = true) @PathVariable RelationshipType type) {
         Optional<Person> person;
         if (type.equals(RelationshipType.REQUESTED)) {
             person = personService.findByAlreadyRequested(emailPerson, emailFriend);
