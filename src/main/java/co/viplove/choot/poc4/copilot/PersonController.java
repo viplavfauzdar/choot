@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +80,69 @@ public class PersonController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + chootMongoDbDocument.getFilename() + ";charset=" + StandardCharsets.UTF_8.name() + "\"")
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(chootBytes);
+    }
+
+    @GetMapping("/files/{email}")
+    @Operation(summary = "Get all files by email")
+    public ResponseEntity<byte[]> getAllChootsByEmail(
+            @Parameter(description = "Email of the person", required = true) @PathVariable String email) throws IOException {
+        Optional<Person> person = personService.findPersonByEmail(email);
+        if (person.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<byte[]> files = new ArrayList<>();
+        for (String fileId : person.get().getMongoDbObjectId()) {
+            ObjectId objectId = new ObjectId(fileId);
+            ChootMongoDbDocument chootMongoDbDocument = chootMongoDbService.getDocumentById(objectId);
+            String contentType = chootMongoDbDocument.getMetadata().getContentType();
+            log.info("CONTENT TYPE: {}", contentType);
+            InputStream chootStream = chootMongoDbService.getChoot(objectId);
+            files.add(chootStream.readAllBytes());
+        }
+
+        //return ResponseEntity.ok(files);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + "chootMongoDbDocument.getFilename()" + ";charset=" + StandardCharsets.UTF_8.name() + "\"")
+                .contentType(MediaType.parseMediaType("image/png"))
+                .body(combineByteArrays(files));
+    }
+
+    public static byte[] combineByteArrays(List<byte[]> byteArrays) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        for (byte[] byteArray : byteArrays) {
+            outputStream.write(byteArray);
+        }
+        return outputStream.toByteArray();
+    }
+
+    @GetMapping("/images/{email}")
+    @Operation(summary = "Get all images by email")
+    public ResponseEntity<List<ResponseEntity<byte[]>>> getAllImagesByEmail(
+            @Parameter(description = "Email of the person", required = true) @PathVariable String email) throws IOException {
+        Optional<Person> person = personService.findPersonByEmail(email);
+        if (person.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<ResponseEntity<byte[]>> images = new ArrayList<>();
+        for (String fileId : person.get().getMongoDbObjectId()) {
+            ObjectId objectId = new ObjectId(fileId);
+            ChootMongoDbDocument chootMongoDbDocument = chootMongoDbService.getDocumentById(objectId);
+            InputStream chootStream = chootMongoDbService.getChoot(objectId);
+            byte[] imageBytes = chootStream.readAllBytes();
+            chootStream.close();
+
+            ResponseEntity<byte[]> imageResponse = ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + chootMongoDbDocument.getFilename() + "\"")
+                    .contentType(MediaType.parseMediaType(chootMongoDbDocument.getMetadata().getContentType()))
+                    .body(imageBytes);
+
+            images.add(imageResponse);
+        }
+
+        return ResponseEntity.ok(images);
     }
 
     @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
