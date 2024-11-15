@@ -1,6 +1,7 @@
 package co.viplove.choot.poc4.copilot;
 
 import co.viplove.choot.entity.ChootMongoDbDocument;
+import co.viplove.choot.poc4.copilot.exception.ErrorResponse;
 import co.viplove.choot.service.ChootMongoDbService;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -173,6 +175,9 @@ public class PersonController {
     public ResponseEntity<Person> requestFriendship(
             @Parameter(description = "Email of the person requesting friendship", required = true) @PathVariable String personEmail,
             @Parameter(description = "Email of the friend", required = true) @PathVariable String friendEmail) {
+        if (personService.findByAlreadyRequested(personEmail, friendEmail).isPresent() || personService.findByAlreadyAccepted(personEmail, friendEmail).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Friendship already requested or accepted");
+        }
         Person person = personService.requestFriendship(personEmail, friendEmail);
         return ResponseEntity.ok(person);
     }
@@ -182,6 +187,9 @@ public class PersonController {
     public ResponseEntity<Person> acceptFriendship(
             @Parameter(description = "Email of the person accepting friendship", required = true) @PathVariable String personEmail,
             @Parameter(description = "Email of the friend", required = true) @PathVariable String friendEmail) {
+        if (personService.findByAlreadyRequested(personEmail, friendEmail).isPresent() || personService.findByAlreadyAccepted(personEmail, friendEmail).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Friendship already requested or accepted");
+        }
         Person person = personService.acceptFriendship(personEmail, friendEmail);
         return ResponseEntity.ok(person);
     }
@@ -222,4 +230,13 @@ public class PersonController {
         }
         return person.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    // Exception handling - not sure what this does
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldError().getDefaultMessage();
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
 }

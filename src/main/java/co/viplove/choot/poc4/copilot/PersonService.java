@@ -1,7 +1,10 @@
 package co.viplove.choot.poc4.copilot;
 
+import co.viplove.choot.poc4.copilot.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -46,7 +49,7 @@ public class PersonService {
             //person.getRequestedFriendsName().add(friend.getName());
             return personRepository.save(person);
         } else {
-            throw new RuntimeException("Person or friend not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Person or friend not found");
         }
     }
 
@@ -63,7 +66,7 @@ public class PersonService {
             //person.getAcceptedFriendsName().add(friend.getName());
             return personRepository.save(person);
         } else {
-            throw new RuntimeException("Person or friend not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Person or friend not found");
         }
     }
 
