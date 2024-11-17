@@ -31,6 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/persons")
 @Slf4j
 @Tag(name = "Person Controller", description = "Person Controller")
+@CrossOrigin(origins = "*") // Allow all origins
 public class PersonController {
 
     @Autowired

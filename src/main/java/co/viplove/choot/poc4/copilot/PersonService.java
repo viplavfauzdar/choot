@@ -25,7 +25,9 @@ public class PersonService {
     }*/
 
     public Optional<Person> findPersonByEmail(String email) {
-        return personRepository.findByEmail(email);
+        Person person = personRepository.findByEmail(email).orElseThrow(()
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, email + " not found"));
+        return Optional.of(person);
     }
 
     public Iterable<Person> findAllPersons() {
