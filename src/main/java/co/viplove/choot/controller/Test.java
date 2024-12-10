@@ -45,6 +45,18 @@ public class Test {
         likes.put("dingo", List.of("viplav"));
         likes.put("john", List.of("dingo"));
         System.out.println(likes);
+
+        String blockString = """
+                this is a block string
+                and doesn't need concatenation.
+                """;
+        System.out.println(blockString);
+
+        //if else shortcut
+        int a = 10;
+        int b = 20;
+        int c = a > b ? a : b;
+        System.out.println(c);
     }
     
     
